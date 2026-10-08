@@ -57,7 +57,18 @@
         "pages": [
           "quickstart",
           "file-1",
-          "file-3"
+          "file-3",
+          "dashboard/index",
+          {
+            "group": "콘텐츠",
+            "pages": [
+              "dashboard/frames",
+              "dashboard/themes",
+              "dashboard/categories",
+              "dashboard/filters",
+              "dashboard/library"
+            ]
+          }
         ],
         "icon": "digital-tachograph"
       },

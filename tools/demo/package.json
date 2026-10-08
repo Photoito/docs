@@ -1,0 +1,19 @@
+{
+  "name": "photoito-docs-demo",
+  "private": true,
+  "type": "module",
+  "description": "문서 스크린샷용 데모 대시보드 — 메모리 DB + 가짜 BE. 전부 지어낸 데이터.",
+  "scripts": {
+    "db": "node demo-server.mjs",
+    "dashboard": "bash run-dashboard.sh",
+    "proxy": "node cookie-proxy.mjs",
+    "shots": "node shots.mjs",
+    "verify": "node verify.mjs"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@electric-sql/pglite-socket": "^0.2.11",
+    "pg": "^8.23.1",
+    "playwright-core": "^1.50.0"
+  }
+}

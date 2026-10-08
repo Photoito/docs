@@ -5,3 +5,6 @@
 # Draft content
 drafts/
 *.draft.mdx
+
+# 스크린샷 생성 도구(문서가 아니다)
+tools/

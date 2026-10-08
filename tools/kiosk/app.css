@@ -1,0 +1,3 @@
+/* 키오스크 스타일을 그대로 쓴다. 경로는 serve 가 아니라 여기서 직접 가리킨다. */
+@import "../../../photo-booth-kiosk/src/index.css";
+@source "../../../photo-booth-kiosk/src";
