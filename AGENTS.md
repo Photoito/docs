@@ -1,33 +1,65 @@
-> **First-time setup**: Customize this file for your project. Prompt the user to customize this file for their project.
-> For Mintlify product knowledge (components, configuration, writing standards),
-> install the Mintlify skill: `npx skills add https://mintlify.com/docs`
+# 문서 작업 안내
 
-# Documentation project instructions
+> Mintlify 의 컴포넌트·설정 문법이 필요하면 Mintlify 스킬을 설치한다: `npx skills add https://mintlify.com/docs`
 
-## About this project
+## 이 프로젝트
 
-- This is a documentation site built on [Mintlify](https://mintlify.com)
-- Pages are MDX files with YAML frontmatter
-- Configuration lives in `docs.json`
-- Use the Mintlify MCP server, `https://mcp.mintlify.com`, to edit content and settings via MCP
-- Use the Mintlify docs MCP server, `https://www.mintlify.com/docs/mcp`, to query information about using Mintlify via MCP
+- 포토이토 키오스크와 대시보드의 사용 안내서다. [Mintlify](https://mintlify.com) 로 만든다.
+- 쪽은 MDX 파일이고 설정과 목차는 `docs.json` 에 있다.
+- `main` 에 올라가면 자동으로 배포된다. 작업은 브랜치에서 한다.
+- 폴더 구조와 미리보기 방법은 [README.md](README.md).
 
-## Terminology
+## 읽는 사람
 
-{/* Add product-specific terms and preferred usage */}
-{/* Example: Use "workspace" not "project", "member" not "user" */}
+가게 사장님과 직원이다. 컴퓨터에 익숙하지 않은 사람이 휴대폰으로 읽는다고 생각하고 쓴다. 개발자나 디자이너가 아니다.
 
-## Style preferences
+예외: `dashboard/frame-design` 은 사장님이 디자이너에게 그대로 전달하는 문서라 크기·형식을 정확한 숫자로 적는다.
 
-{/* Add any project-specific style rules below */}
+## 쓰는 법
 
-- Use active voice and second person ("you")
-- Keep sentences concise — one idea per sentence
-- Use sentence case for headings
-- Bold for UI elements: Click **Settings**
-- Code formatting for file names, commands, paths, and code references
+- **최대한 쉽게.** 한 단계에 동작 하나, 한 문장에 내용 하나.
+- 말투는 대시보드와 같은 **해요체**다("눌러요", "확인하세요").
+- 화면의 버튼과 메뉴 이름은 **굵게** 쓰고, 화면에 보이는 글자 그대로 쓴다. 대시보드 문구의 원본은 대시보드 레포의 `messages/ko.json` 이다.
+- 화면에 어려운 이름이 나오면 그 이름을 보여 준 뒤 풀어서 설명한다. 예: 「프레임 메타데이터 설정」 → "프레임의 이름과 가격을 적는 곳".
+- 순서가 있는 일은 `<Steps>` 로 쓴다. 누를 곳은 스크린샷에 빨간 테두리로 표시한다.
+- 익숙한 사람만 쓰는 기능은 따로 떼어 쓰고, 맨 앞에 "쓰지 않아도 된다"고 밝힌다.
+- 각 쪽 끝에 「잘 안 될 때」를 둔다.
 
-## Content boundaries
+## 용어
 
-{/* Define what should and shouldn't be documented */}
-{/* Example: Don't document internal admin features */}
+| 쓰는 말 | 쓰지 않는 말 | 비고 |
+| --- | --- | --- |
+| 키오스크 | 기기, 부스, 디바이스 | 화면에 「기기」라고 나오면 그 이름은 그대로 쓴다 |
+| 대시보드 | 관리자 페이지, 어드민 | 사장님이 쓰는 관리 화면 |
+| 첫화면 | 테마 | 화면에 「테마」가 섞여 나온다는 점은 문서에서 한 번 알려 준다 |
+| 프레임 | 템플릿 | |
+| 사진 자리 | 슬롯, 레이아웃 영역 | 프레임에서 사진이 들어가는 곳 |
+| 감자 | 포인트, 크레딧 | 처음 나올 때 "포토이토에서 쓰는 포인트"라고 풀어 준다 |
+| 사장님 | 점주, 오너 | |
+
+## 사실 확인
+
+- **확인한 것만 쓴다.** 동작은 코드를 읽거나 데모에서 직접 해 보고 쓴다. 모르는 것은 쓰지 않거나 "확인이 필요하다"고 남긴다.
+- 감자가 드는 개수처럼 운영 중에 바뀌는 숫자는, 숫자와 함께 "지금 값은 어디서 확인하는지"를 적는다.
+- 대시보드에서 프레임이나 첫화면을 보낸 뒤에는 **키오스크에서 새로고침하고 켜는 단계**까지 써야 한다. 키오스크는 새로 받은 프레임을 꺼진 상태로 등록한다.
+
+## 스크린샷
+
+- 손으로 찍지 않는다. `tools/` 의 도구로 만든다([tools/README.md](tools/README.md)).
+- 실제 가게 화면은 쓰지 않는다. 매출과 손님 연락처가 들어간다.
+- 그림에는 `alt` 로 무엇이 보이는지 적는다.
+
+## 쓰지 않는 것
+
+- 관리자(운영팀) 전용 화면
+- 개발·배포 방법, 내부 구조
+- 가격표처럼 자주 바뀌고 다른 곳에 원본이 있는 내용
+
+## 올리기 전에
+
+미리보기를 띄우고 깨진 그림과 죽은 링크를 검사한다.
+
+```bash
+npx mint@latest dev --port 3345
+cd tools/demo && npm run verify -- http://localhost:3345 dashboard/frames
+```

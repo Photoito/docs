@@ -12,12 +12,51 @@
     "dark": "/logo/photoito_favicon.svg"
   },
   "navigation": {
-    "pages": [
+    "languages": [
       {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
+        "language": "ko",
+        "groups": [
+          {
+            "group": "시작하기",
+            "icon": "house",
+            "pages": [
+              "index"
+            ]
+          },
+          {
+            "group": "설치 및 수리",
+            "icon": "gear",
+            "pages": [
+              "install/prepare"
+            ]
+          },
+          {
+            "group": "대시보드",
+            "icon": "digital-tachograph",
+            "pages": [
+              "dashboard/index",
+              {
+                "group": "콘텐츠",
+                "expanded": true,
+                "pages": [
+                  "dashboard/frame-design",
+                  "dashboard/frames",
+                  "dashboard/frames-advanced",
+                  "dashboard/themes",
+                  "dashboard/categories",
+                  "dashboard/filters",
+                  "dashboard/library"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "오류 해결하기",
+            "icon": "warning",
+            "pages": [
+              "troubleshooting/upload"
+            ]
+          }
         ]
       }
     ],
@@ -34,61 +73,7 @@
           "href": "https://dashboard.photoito.kr"
         }
       ]
-    },
-    "groups": [
-      {
-        "group": "설치 및 수리",
-        "pages": [
-          "index",
-          "as"
-        ],
-        "icon": "gear"
-      },
-      {
-        "group": "키오스크",
-        "pages": [
-          "file",
-          "file-2"
-        ],
-        "icon": "oven"
-      },
-      {
-        "group": "대시보드",
-        "pages": [
-          "quickstart",
-          "file-1",
-          "file-3",
-          "dashboard/index",
-          {
-            "group": "콘텐츠",
-            "pages": [
-              "dashboard/frames",
-              "dashboard/frames-advanced",
-              "dashboard/themes",
-              "dashboard/categories",
-              "dashboard/filters",
-              "dashboard/library"
-            ],
-            "expanded": true
-          }
-        ],
-        "icon": "digital-tachograph"
-      },
-      {
-        "group": "오류 해결하기",
-        "pages": [
-          "file-4",
-          "file-5",
-          "file-6",
-          "file-7",
-          "file-8",
-          "untitled-page",
-          "file-9",
-          "file-10"
-        ],
-        "icon": "warning"
-      }
-    ]
+    }
   },
   "logo": {
     "light": "/images/photoito_docs_logo_light.png",
@@ -97,14 +82,14 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
+        "label": "문의하기",
         "href": "mailto:support@photoito.kr"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.mintlify.com"
+      "label": "대시보드 열기",
+      "href": "https://dashboard.photoito.kr"
     }
   },
   "contextual": {
@@ -118,5 +103,16 @@
       "cursor",
       "vscode"
     ]
-  }
+  },
+  "description": "포토이토 키오스크를 설치하고, 대시보드로 가게를 운영하는 방법을 안내해요.",
+  "redirects": [
+    {
+      "source": "/file-1",
+      "destination": "/dashboard/frame-design"
+    },
+    {
+      "source": "/file-10",
+      "destination": "/troubleshooting/upload"
+    }
+  ]
 }
