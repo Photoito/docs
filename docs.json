@@ -68,7 +68,8 @@
               "dashboard/categories",
               "dashboard/filters",
               "dashboard/library"
-            ]
+            ],
+            "expanded": true
           }
         ],
         "icon": "digital-tachograph"
