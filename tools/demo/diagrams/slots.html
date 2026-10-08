@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8" />
+<style>
+  body { margin: 0; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; background: #fff; color: #1f2937; }
+  #d { width: 1160px; padding: 36px 40px 40px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+  .card { text-align: center; }
+  .paper { width: 200px; height: 300px; margin: 0 auto; background: #16324f; border-radius: 6px; position: relative; }
+  .slot { position: absolute; background: repeating-conic-gradient(#e5e7eb 0% 25%, #fff 0% 50%) 0 0 / 14px 14px; }
+  .tag { display: inline-block; margin-top: 16px; padding: 4px 14px; border-radius: 999px; font-size: 17px; font-weight: 700; color: #fff; }
+  .ok { background: #15803d; } .no { background: #dc2626; }
+  h3 { margin: 10px 0 4px; font-size: 20px; }
+  .sub { font-size: 15px; color: #6b7280; line-height: 1.45; }
+</style>
+<div id="d">
+  <div class="card">
+    <div class="paper">
+      <div class="slot" style="left:14px;top:14px;width:80px;height:112px"></div><div class="slot" style="left:106px;top:14px;width:80px;height:112px"></div>
+      <div class="slot" style="left:14px;top:138px;width:80px;height:112px"></div><div class="slot" style="left:106px;top:138px;width:80px;height:112px"></div>
+    </div>
+    <span class="tag ok">좋아요</span><h3>따로 떨어진 네모</h3><div class="sub">자리마다 사이가 막혀 있고<br />크기와 비율이 같아요</div>
+  </div>
+  <div class="card">
+    <div class="paper">
+      <div class="slot" style="left:14px;top:14px;width:172px;height:112px"></div>
+      <div class="slot" style="left:86px;top:126px;width:28px;height:12px"></div>
+      <div class="slot" style="left:14px;top:138px;width:172px;height:112px"></div>
+    </div>
+    <span class="tag no">안 돼요</span><h3>서로 이어진 자리</h3><div class="sub">투명한 곳이 이어져 있으면<br />한 자리로 합쳐져요</div>
+  </div>
+  <div class="card">
+    <div class="paper">
+      <div class="slot" style="left:14px;top:14px;width:172px;height:160px"></div>
+      <div class="slot" style="left:150px;top:262px;width:22px;height:22px"></div>
+    </div>
+    <span class="tag no">안 돼요</span><h3>너무 작은 자리</h3><div class="sub">전체 넓이의 1%보다 작으면<br />사진 자리로 잡히지 않아요</div>
+  </div>
+  <div class="card">
+    <div class="paper">
+      <div class="slot" style="left:14px;top:14px;width:172px;height:236px;clip-path:polygon(50% 0,61% 36%,98% 36%,68% 58%,79% 94%,50% 72%,21% 94%,32% 58%,2% 36%,39% 36%)"></div>
+    </div>
+    <span class="tag no">조심해요</span><h3>가늘고 뾰족한 모양</h3><div class="sub">별처럼 뚫린 곳이 적은 모양은<br />사진 자리로 잡히지 않아요</div>
+  </div>
+</div>
+</html>

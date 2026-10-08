@@ -63,6 +63,7 @@
             "group": "콘텐츠",
             "pages": [
               "dashboard/frames",
+              "dashboard/frames-advanced",
               "dashboard/themes",
               "dashboard/categories",
               "dashboard/filters",
