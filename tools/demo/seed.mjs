@@ -124,9 +124,9 @@ export async function seed(db) {
   // ── 쿠폰 · 공지 · 감자 ──
   await db.exec(`
     INSERT INTO coupons (id, code, name, description, discount_type, discount_value, max_discount_amount, valid_from, valid_to, usage_limit, purpose, is_active, created_by, created_at) VALUES
-      ('00000000-0000-4000-8000-0000000000c1', 'WELCOME1000', '첫 방문 1,000원 할인', '처음 오신 손님께 드리는 할인', 'fixed', 1000, NULL, ${q(iso(days(-60)))}, ${q(iso(days(120)))}, 500, 'welcome', true, 'demo-owner', ${q(iso(days(-60)))}),
-      ('00000000-0000-4000-8000-0000000000c2', 'AUTUMN2000', '가을 시즌 2,000원 할인', '시즌 프레임 출시 기념', 'fixed', 2000, NULL, ${q(iso(days(-14)))}, ${q(iso(days(30)))}, 300, 'event', true, 'demo-owner', ${q(iso(days(-14)))}),
-      ('00000000-0000-4000-8000-0000000000c3', 'BDAY-FREE', '생일 축하 무료 촬영', '생일 당일 1회 무료', 'percentage', 100, NULL, ${q(iso(days(-90)))}, ${q(iso(days(275)))}, NULL, 'birthday', true, 'demo-owner', ${q(iso(days(-90)))});
+      ('00000000-0000-4000-8000-0000000000c1', '104729', '첫 방문 1,000원 할인', '처음 오신 손님께 드리는 할인', 'fixed', 1000, NULL, ${q(iso(days(-60)))}, ${q(iso(days(120)))}, 500, 'welcome', true, 'demo-owner', ${q(iso(days(-60)))}),
+      ('00000000-0000-4000-8000-0000000000c2', '582013', '가을 시즌 2,000원 할인', '시즌 프레임 출시 기념', 'fixed', 2000, NULL, ${q(iso(days(-14)))}, ${q(iso(days(30)))}, 300, 'event', true, 'demo-owner', ${q(iso(days(-14)))}),
+      ('00000000-0000-4000-8000-0000000000c3', '730156', '생일 축하 무료 촬영', '생일 당일 1회 무료', 'percentage', 100, NULL, ${q(iso(days(-90)))}, ${q(iso(days(275)))}, NULL, 'birthday', true, 'demo-owner', ${q(iso(days(-90)))});
     INSERT INTO coupon_stores (coupon_id, store_id) SELECT id, '${STORE_ID}' FROM coupons;
 
     INSERT INTO notices (category, title, body_md, pinned, publish_at, created_by, created_at) VALUES
@@ -138,8 +138,24 @@ export async function seed(db) {
     INSERT INTO store_potato_allowances (id, store_id, quota, used, expires_at, is_active, notes, activated_at, last_used_at, created_at) VALUES
       ('00000000-0000-4000-8000-0000000000b1', '${STORE_ID}', 138000, 18100, ${q(iso(days(64)))}, true, '감자 50,000개 충전 + 플랜 지급', ${q(iso(days(-26)))}, now(), ${q(iso(days(-26)))});
 
+    -- 감자 단가: 2026-10-07 운영 값. DDL 기본값(0.5 등)을 그대로 두면 화면의 차감 안내가 실제와 달라진다.
+    INSERT INTO potato_unit_costs (action_code, unit_cost, description) VALUES
+      ('frame_send', 500, '프레임 1개 기기 전송'),
+      ('frame_metadata_update', 100, '프레임 메타데이터 수정 1회'),
+      ('theme_send', 700, '첫화면 1개 기기 전송'),
+      ('theme_metadata_update', 100, '첫화면 메타데이터 수정 1회'),
+      ('kakao_send', 100, '카카오 알림톡 1건 발송'),
+      ('share_link_create', 50, '공유 링크 신규 발급'),
+      ('reprint', 500, '관리자 재인쇄 1회'),
+      ('data_export', 10, '데이터 내보내기 파일 1건')
+    ON CONFLICT (action_code) DO UPDATE SET unit_cost = EXCLUDED.unit_cost, description = EXCLUDED.description;
+
     INSERT INTO store_alert_rules (id, store_id, event_type, params, enabled, created_by, created_at) VALUES
       ('00000000-0000-4000-8000-0000000000d1', '${STORE_ID}', 'printer_paper_low', '{"threshold": 50}'::jsonb, true, 'demo-owner', ${q(iso(days(-50)))});
+    INSERT INTO store_alert_channels (rule_id, channel, enabled) VALUES ('00000000-0000-4000-8000-0000000000d1', 'push', true);
+    INSERT INTO store_alert_recipients (rule_id, user_id) VALUES
+      ('00000000-0000-4000-8000-0000000000d1', 'demo-owner'),
+      ('00000000-0000-4000-8000-0000000000d1', 'demo-staff-1');
   `);
 
   await db.exec(`

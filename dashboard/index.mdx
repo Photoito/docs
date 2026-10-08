@@ -14,17 +14,49 @@ description: "포토이토 대시보드를 화면별로 안내해요."
 
 ## 화면별 안내
 
+### 휴대폰으로 보기
+
 <CardGroup cols={2}>
   <Card title="포토이토 파트너 앱" icon="mobile-screen" href="/dashboard/app">
     휴대폰에서 매출을 확인하고 알림을 받아요.
   </Card>
-  <Card title="프레임 관리" icon="image" href="/dashboard/frames">
-    손님이 고르는 사진 틀을 올리고, 가격을 정하고, 키오스크에 보내요.
+</CardGroup>
+
+### 매일 보는 화면
+
+<CardGroup cols={2}>
+  <Card title="홈" icon="house" href="/dashboard/overview">
+    오늘 매출과 이번 달 매출을 한눈에 봐요.
   </Card>
+  <Card title="통계" icon="chart-column" href="/dashboard/analytics">
+    기간을 정해 매출, 붐비는 시간, 인기 프레임을 봐요.
+  </Card>
+  <Card title="이용 내역" icon="clock-rotate-left" href="/dashboard/usage-history">
+    손님 한 팀 한 팀의 촬영과 결제를 확인해요.
+  </Card>
+</CardGroup>
+
+### 키오스크
+
+<CardGroup cols={2}>
+  <Card title="장치 관리" icon="desktop" href="/dashboard/devices">
+    키오스크가 켜져 있는지, 용지가 얼마나 남았는지 봐요.
+  </Card>
+  <Card title="프리셋 관리" icon="sliders" href="/dashboard/presets">
+    키오스크 설정을 저장해 두고 다시 써요. 익숙한 분을 위한 기능이에요.
+  </Card>
+</CardGroup>
+
+### 콘텐츠
+
+<CardGroup cols={2}>
   <Card title="프레임 제작하기" icon="ruler-combined" href="/dashboard/frame-design">
     프레임 그림의 크기와 규칙. 디자이너에게 전달하는 문서예요.
   </Card>
-  <Card title="프레임 고급 설정" icon="sliders" href="/dashboard/frames-advanced">
+  <Card title="프레임 관리" icon="image" href="/dashboard/frames">
+    손님이 고르는 사진 틀을 올리고, 가격을 정하고, 키오스크에 보내요.
+  </Card>
+  <Card title="프레임 고급 설정" icon="wand-magic-sparkles" href="/dashboard/frames-advanced">
     날짜, QR 코드, 함께찍기 모드를 써요.
   </Card>
   <Card title="첫화면 관리" icon="tv" href="/dashboard/themes">
@@ -33,10 +65,47 @@ description: "포토이토 대시보드를 화면별로 안내해요."
   <Card title="카테고리 관리" icon="folder" href="/dashboard/categories">
     프레임을 종류별로 묶는 이름표를 만들어요.
   </Card>
-  <Card title="필터 관리" icon="wand-magic-sparkles" href="/dashboard/filters">
+  <Card title="필터 관리" icon="droplet" href="/dashboard/filters">
     사진에 자동으로 입힐 보정을 만들어요.
   </Card>
   <Card title="공유 저장소" icon="share-nodes" href="/dashboard/library">
     가게가 여러 곳일 때 프레임과 첫화면을 한곳에서 관리해요.
+  </Card>
+</CardGroup>
+
+### 가게 운영
+
+<CardGroup cols={2}>
+  <Card title="쿠폰 관리" icon="ticket" href="/dashboard/coupons">
+    손님에게 줄 할인 쿠폰을 만들어요.
+  </Card>
+  <Card title="알림 설정" icon="bell" href="/dashboard/alerts">
+    용지가 떨어져 갈 때 앱으로 알림을 받아요.
+  </Card>
+  <Card title="직원 관리" icon="user-group" href="/dashboard/staff">
+    직원을 초대하고 할 수 있는 일을 정해요.
+  </Card>
+  <Card title="내 가게 정보" icon="store" href="/dashboard/store-info">
+    가게 이름, 연락처, 운영시간을 확인하고 고쳐요.
+  </Card>
+  <Card title="공지사항" icon="bullhorn" href="/dashboard/notices">
+    포토이토가 보내는 안내를 읽어요.
+  </Card>
+</CardGroup>
+
+### 청구 및 구독
+
+<CardGroup cols={2}>
+  <Card title="내 라이선스" icon="key" href="/dashboard/license">
+    키오스크 이용권을 확인하고 바꾸거나 해지해요.
+  </Card>
+  <Card title="내 감자" icon="seedling" href="/dashboard/potato">
+    남은 감자를 확인하고 충전해요.
+  </Card>
+  <Card title="내 결제내역" icon="receipt" href="/dashboard/payments">
+    결제한 내역을 확인하고, 조건이 맞으면 환불해요.
+  </Card>
+  <Card title="결제수단 관리" icon="credit-card" href="/dashboard/payment-methods">
+    자동결제에 쓰는 카드를 등록하고 바꿔요.
   </Card>
 </CardGroup>

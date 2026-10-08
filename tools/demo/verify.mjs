@@ -28,7 +28,9 @@ for (const [s, hrefs] of found) for (const h of hrefs) {
   const [path, hash] = h.startsWith("#") ? [s, h.slice(1)] : [h.slice(1).split("#")[0], h.split("#")[1]];
   const target = await load(path);
   if (!target) { dead++; console.log(`  죽은 링크  ${s} → ${h}`); continue; }
-  if (hash && !target.includes(decodeURIComponent(hash))) { dead++; console.log(`  죽은 앵커  ${s} → ${decodeURIComponent(h)}`); }
+  // 제목에 % 가 들어가면 앵커가 올바른 인코딩이 아니라 decodeURIComponent 가 던진다 — 그때는 원문 그대로 비교한다.
+  const plain = (v) => { try { return decodeURIComponent(v); } catch { return v; } };
+  if (hash && !target.includes(plain(hash)) && !target.includes(hash)) { dead++; console.log(`  죽은 앵커  ${s} → ${plain(h)}`); }
 }
 console.log(dead ? `문제 ${dead}건` : "죽은 링크·앵커 없음");
 await b.close();

@@ -37,6 +37,22 @@
               "dashboard/index",
               "dashboard/app",
               {
+                "group": "매일 보는 화면",
+                "expanded": true,
+                "pages": [
+                  "dashboard/overview",
+                  "dashboard/analytics",
+                  "dashboard/usage-history"
+                ]
+              },
+              {
+                "group": "키오스크",
+                "pages": [
+                  "dashboard/devices",
+                  "dashboard/presets"
+                ]
+              },
+              {
                 "group": "콘텐츠",
                 "expanded": true,
                 "pages": [
@@ -47,6 +63,25 @@
                   "dashboard/categories",
                   "dashboard/filters",
                   "dashboard/library"
+                ]
+              },
+              {
+                "group": "가게 운영",
+                "pages": [
+                  "dashboard/coupons",
+                  "dashboard/alerts",
+                  "dashboard/staff",
+                  "dashboard/store-info",
+                  "dashboard/notices"
+                ]
+              },
+              {
+                "group": "청구 및 구독",
+                "pages": [
+                  "dashboard/license",
+                  "dashboard/potato",
+                  "dashboard/payments",
+                  "dashboard/payment-methods"
                 ]
               }
             ]
