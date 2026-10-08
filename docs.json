@@ -1,0 +1,109 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "aspen",
+  "name": "포토이토 사용자 가이드",
+  "colors": {
+    "primary": "#8a6543",
+    "light": "#f6dfb7",
+    "dark": "#9d7d46"
+  },
+  "favicon": {
+    "light": "/logo/photoito_favicon.svg",
+    "dark": "/logo/photoito_favicon.svg"
+  },
+  "navigation": {
+    "pages": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "index",
+          "quickstart"
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "홈페이지",
+          "icon": "plane-landing-gear",
+          "href": "https://www.photoito.kr"
+        },
+        {
+          "anchor": "대시보드",
+          "icon": "dashboard",
+          "href": "https://dashboard.photoito.kr"
+        }
+      ]
+    },
+    "groups": [
+      {
+        "group": "설치 및 수리",
+        "pages": [
+          "index",
+          "as"
+        ],
+        "icon": "gear"
+      },
+      {
+        "group": "키오스크",
+        "pages": [
+          "file",
+          "file-2"
+        ],
+        "icon": "oven"
+      },
+      {
+        "group": "대시보드",
+        "pages": [
+          "quickstart",
+          "file-1",
+          "file-3"
+        ],
+        "icon": "digital-tachograph"
+      },
+      {
+        "group": "오류 해결하기",
+        "pages": [
+          "file-4",
+          "file-5",
+          "file-6",
+          "file-7",
+          "file-8",
+          "untitled-page",
+          "file-9",
+          "file-10"
+        ],
+        "icon": "warning"
+      }
+    ]
+  },
+  "logo": {
+    "light": "/images/photoito_docs_logo_light.png",
+    "dark": "/images/photoito_docs_logo_dark.png"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@photoito.kr"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://app.mintlify.com"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  }
+}
