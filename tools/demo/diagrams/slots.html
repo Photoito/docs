@@ -1,45 +1,70 @@
 <!doctype html>
 <html lang="ko">
 <meta charset="utf-8" />
+<!-- 사진 자리 모양 예시. 빨간 점선 = 포토이토가 잡는 사진 자리(뚫린 모양을 감싸는 가장 큰 네모).
+     인식 여부는 대시보드에 실제로 올려 확인한 결과와 맞췄다(tools/demo/sample-shapes.mjs 로 재현). -->
 <style>
   body { margin: 0; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; background: #fff; color: #1f2937; }
-  #d { width: 1160px; padding: 36px 40px 40px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
-  .card { text-align: center; }
-  .paper { width: 200px; height: 300px; margin: 0 auto; background: #16324f; border-radius: 6px; position: relative; }
-  .slot { position: absolute; background: repeating-conic-gradient(#e5e7eb 0% 25%, #fff 0% 50%) 0 0 / 14px 14px; }
-  .tag { display: inline-block; margin-top: 16px; padding: 4px 14px; border-radius: 999px; font-size: 17px; font-weight: 700; color: #fff; }
+  #d { width: 1160px; padding: 30px 40px 36px; }
+  h2 { font-size: 22px; margin: 0 0 16px; display: flex; align-items: center; gap: 10px; }
+  #ok { margin-bottom: 44px; }
+  .pill { padding: 3px 14px; border-radius: 999px; font-size: 16px; color: #fff; }
   .ok { background: #15803d; } .no { background: #dc2626; }
-  h3 { margin: 10px 0 4px; font-size: 20px; }
-  .sub { font-size: 15px; color: #6b7280; line-height: 1.45; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
+  .card { text-align: center; }
+  .card svg { width: 100%; height: auto; display: block; border-radius: 8px; }
+  .name { font-size: 17px; font-weight: 700; margin-top: 10px; }
+  .sub { font-size: 13.5px; color: #6b7280; line-height: 1.4; margin-top: 2px; }
+  .legend { font-size: 15px; color: #4b5563; margin: -6px 0 18px; display: flex; align-items: center; gap: 8px; }
+  .dash { display: inline-block; width: 34px; height: 18px; border: 2.5px dashed #dc2626; border-radius: 3px; }
 </style>
 <div id="d">
-  <div class="card">
-    <div class="paper">
-      <div class="slot" style="left:14px;top:14px;width:80px;height:112px"></div><div class="slot" style="left:106px;top:14px;width:80px;height:112px"></div>
-      <div class="slot" style="left:14px;top:138px;width:80px;height:112px"></div><div class="slot" style="left:106px;top:138px;width:80px;height:112px"></div>
-    </div>
-    <span class="tag ok">좋아요</span><h3>따로 떨어진 네모</h3><div class="sub">자리마다 사이가 막혀 있고<br />크기와 비율이 같아요</div>
-  </div>
-  <div class="card">
-    <div class="paper">
-      <div class="slot" style="left:14px;top:14px;width:172px;height:112px"></div>
-      <div class="slot" style="left:86px;top:126px;width:28px;height:12px"></div>
-      <div class="slot" style="left:14px;top:138px;width:172px;height:112px"></div>
-    </div>
-    <span class="tag no">안 돼요</span><h3>서로 이어진 자리</h3><div class="sub">투명한 곳이 이어져 있으면<br />한 자리로 합쳐져요</div>
-  </div>
-  <div class="card">
-    <div class="paper">
-      <div class="slot" style="left:14px;top:14px;width:172px;height:160px"></div>
-      <div class="slot" style="left:150px;top:262px;width:22px;height:22px"></div>
-    </div>
-    <span class="tag no">안 돼요</span><h3>너무 작은 자리</h3><div class="sub">전체 넓이의 1%보다 작으면<br />사진 자리로 잡히지 않아요</div>
-  </div>
-  <div class="card">
-    <div class="paper">
-      <div class="slot" style="left:14px;top:14px;width:172px;height:236px;clip-path:polygon(50% 0,61% 36%,98% 36%,68% 58%,79% 94%,50% 72%,21% 94%,32% 58%,2% 36%,39% 36%)"></div>
-    </div>
-    <span class="tag no">조심해요</span><h3>가늘고 뾰족한 모양</h3><div class="sub">별처럼 뚫린 곳이 적은 모양은<br />사진 자리로 잡히지 않아요</div>
-  </div>
+  <h2><span class="pill ok">좋아요</span> 이런 모양은 모두 사진 자리로 잡혀요</h2>
+  <div class="legend"><span class="dash"></span> 빨간 점선 = 사진이 들어가는 네모. 뚫린 모양을 감싸는 가장 큰 네모예요.</div>
+  <div class="grid" id="ok"></div>
+  <h2><span class="pill no">조심해요</span> 이런 경우는 뜻대로 안 돼요</h2>
+  <div class="grid" id="no"></div>
 </div>
+<script>
+  const W = 180, H = 230, BG = "#f3e3c8";
+  let uid = 0;
+  // shape(b) → SVG 도형 문자열(뚫린 모양). box = 그 모양을 감싸는 네모(인식되는 사진 자리).
+  function card(name, sub, holes, { showBox = true } = {}) {
+    const id = "p" + uid++;
+    const defs = `<defs><pattern id="${id}" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#fff"/><rect width="8" height="8" fill="#e5e7eb"/><rect x="8" y="8" width="8" height="8" fill="#e5e7eb"/></pattern>
+      <filter id="${id}r" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="9"/></filter>
+      <filter id="${id}c" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.5 0.05" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="16"/></filter></defs>`;
+    const body = holes.map((h) => h.svg(id)).join("");
+    const boxes = showBox ? holes.filter((h) => h.box).map((h) => `<rect x="${h.box[0]}" y="${h.box[1]}" width="${h.box[2]}" height="${h.box[3]}" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="7 5"/>`).join("") : "";
+    return `<div class="card"><svg viewBox="0 0 ${W} ${H}">${defs}<rect width="${W}" height="${H}" fill="${BG}"/>${body}${boxes}</svg><div class="name">${name}</div><div class="sub">${sub}</div></div>`;
+  }
+  const B = [22, 22, 136, 150]; // 기본 자리(x, y, w, h)
+  const star = (k) => {
+    const cx = B[0] + B[2] / 2, cy = B[1] + B[3] / 2 + 4, R = 72, r = R * k, pts = [];
+    for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5, rad = i % 2 ? r : R; pts.push([cx + Math.cos(a) * rad, cy + Math.sin(a) * rad]); }
+    const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+    return { pts: pts.map((p) => p.join(",")).join(" "), box: [Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)] };
+  };
+  const plump = star(0.64), sharp = star(0.38);
+  const heartPath = "M90 168 C 8 112, 30 26, 90 62 C 150 26, 172 112, 90 168 Z";
+
+  document.getElementById("ok").innerHTML = [
+    card("둥근 네모", "가장 흔한 모양", [{ svg: (id) => `<rect x="${B[0]}" y="${B[1]}" width="${B[2]}" height="${B[3]}" rx="18" fill="url(#${id})"/>`, box: B }]),
+    card("동그라미", "타원도 돼요", [{ svg: (id) => `<ellipse cx="90" cy="97" rx="68" ry="75" fill="url(#${id})"/>`, box: B }]),
+    card("하트", "", [{ svg: (id) => `<path d="${heartPath}" fill="url(#${id})"/>`, box: [29, 47, 122, 121] }]),
+    card("통통한 별", "살이 두툼한 별", [{ svg: (id) => `<polygon points="${plump.pts}" fill="url(#${id})"/>`, box: plump.box }]),
+    card("손그림 느낌", "가장자리가 삐뚤삐뚤", [{ svg: (id) => `<mask id="${id}m"><rect x="${B[0] + 4}" y="${B[1] + 4}" width="${B[2] - 8}" height="${B[3] - 8}" fill="#fff" filter="url(#${id}r)"/></mask><rect width="${W}" height="${H}" fill="url(#${id})" mask="url(#${id}m)"/>`, box: [B[0] - 1, B[1] - 1, B[2] + 2, B[3] + 2] }]),
+    card("크레파스 느낌", "가장자리가 거칠고 들쭉날쭉", [{ svg: (id) => `<mask id="${id}m"><g filter="url(#${id}c)">${Array.from({ length: 11 }, (_, i) => `<rect x="${B[0] + 6 + (i % 3) * 3}" y="${B[1] + 4 + i * 13}" width="${B[2] - 14 - (i % 2) * 6}" height="17" rx="8" fill="#fff"/>`).join("")}</g></mask><rect width="${W}" height="${H}" fill="url(#${id})" mask="url(#${id}m)"/>`, box: [B[0] - 2, B[1] - 2, B[2] + 4, B[3] + 6] }])
+  ].join("");
+
+  document.getElementById("no").innerHTML = [
+    card("가늘고 뾰족한 별", "뚫린 곳이 감싸는 네모의<br />절반이 안 되면 못 찾아요", [{ svg: (id) => `<polygon points="${sharp.pts}" fill="url(#${id})"/>` }], { showBox: false }),
+    card("서로 이어진 자리", "조금이라도 이어지면<br />한 자리로 합쳐져요", [
+      { svg: (id) => `<rect x="22" y="22" width="136" height="66" fill="url(#${id})"/><rect x="80" y="88" width="20" height="18" fill="url(#${id})"/><rect x="22" y="106" width="136" height="66" fill="url(#${id})"/>`, box: [22, 22, 136, 150] }
+    ]),
+    card("너무 작은 구멍", "전체 넓이의 1%보다<br />작으면 못 찾아요", [{ svg: (id) => `<rect x="22" y="22" width="136" height="110" rx="8" fill="url(#${id})"/><rect x="132" y="180" width="16" height="16" fill="url(#${id})"/>`, box: [22, 22, 136, 110] }]),
+    card("흰색으로 칠한 자리", "투명이 아니면<br />사진 자리가 아니에요", [{ svg: () => `<rect x="${B[0]}" y="${B[1]}" width="${B[2]}" height="${B[3]}" rx="12" fill="#ffffff"/>` }], { showBox: false }),
+    card("흐릿한 가장자리", "번지듯 흐리면 사진 둘레에<br />검은 줄이 생길 수 있어요", [{ svg: (id) => `<rect x="${B[0] + 8}" y="${B[1] + 8}" width="${B[2] - 16}" height="${B[3] - 16}" rx="16" fill="url(#${id})" style="filter:blur(7px)"/>`, box: [B[0] + 8, B[1] + 8, B[2] - 16, B[3] - 16] }])
+  ].join("");
+</script>
 </html>
