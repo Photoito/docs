@@ -20,7 +20,8 @@
             "group": "시작하기",
             "icon": "house",
             "pages": [
-              "index"
+              "index",
+              "support"
             ]
           },
           {
@@ -120,7 +121,7 @@
     "links": [
       {
         "label": "문의하기",
-        "href": "mailto:support@photoito.kr"
+        "href": "/support"
       }
     ],
     "primary": {
