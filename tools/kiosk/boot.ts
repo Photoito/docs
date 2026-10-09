@@ -62,6 +62,11 @@ const CASES: Record<string, () => void> = {
     api.licenseCheck = () => Promise.resolve(invalid("License file not found or corrupted", false));
     api.licenseAttemptSelfHeal = () => Promise.resolve({ recovered: false, action: "wait-network", nextRetryMs: 32000 });
   },
+  // 자동으로 다시 확인하는 중(인터넷은 되는데 서버가 라이선스를 받아 주지 않을 때).
+  "self-heal-server": () => {
+    api.licenseCheck = () => Promise.resolve(invalid("License file not found or corrupted", false));
+    api.licenseAttemptSelfHeal = () => Promise.resolve({ recovered: false, action: "reactivate", nextRetryMs: 60000 });
+  },
   // 필수 프로그램 파일이 없다.
   blocked: () => {
     api.checkRequiredBinaries = () => Promise.resolve({ allPresent: false, missing: ["camera-agent.exe"] });
