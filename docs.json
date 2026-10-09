@@ -90,6 +90,7 @@
             "group": "오류 해결하기",
             "icon": "warning",
             "pages": [
+              "troubleshooting/boot",
               "troubleshooting/upload"
             ]
           }

@@ -49,6 +49,8 @@ cd tools/demo && npm run shots -- kiosk-frames
 - 키오스크 레포의 화면 컴포넌트(`src/pages/AdminPage` 등)를 그대로 불러와 브라우저에서 띄운다.
   키오스크 레포는 읽기만 한다 — 수정하지 않고, 캐시도 `tools/kiosk/.tmp` 에 둔다.
 - Electron 다리(`window.agentAPI`, `window.kiosk`)는 `tools/kiosk/stubs.ts` 가 가짜로 채운다.
+- 부팅 화면은 `/?screen=boot&case=<이름>` 으로 상황별로 띄운다(`tools/kiosk/boot.ts`, 찍기는 `npm run shots -- kiosk-boot`).
+  가짜 응답의 문구는 키오스크 메인 프로세스와 백엔드가 실제로 돌려주는 형태 그대로 적는다 — 문서가 그 문구를 찾아보게 돼 있다.
   「새로고침」을 누르면 프레임이 하나 새로 들어오도록 해 두었다(대시보드에서 방금 보낸 프레임 역할).
 - 프레임 데이터는 대시보드 데모와 같은 것을 쓴다(`tools/demo/seed.mjs`).
 - 로그인 직후의 「시스템 정보」 화면은 가짜 데이터로 채워지지 않는다. 문서에 쓰지 않는다.

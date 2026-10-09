@@ -9,7 +9,7 @@ async function load(path) {
   if (ids.has(path)) return ids.get(path);
   const res = await p.goto(`${base}/${path}`, { waitUntil: "networkidle", timeout: 120000 });
   await p.waitForTimeout(1200);
-  const notFound = res.status() >= 400 || (await p.getByText(/Page not found|404/).count()) > 0;
+  const notFound = res.status() >= 400 || (await p.getByText(/Page not found/).count()) > 0; // 본문에 "404"가 나오는 쪽이 있어 숫자로는 판단하지 않는다
   const v = notFound ? null : await p.$$eval("h2[id], h3[id]", (h) => h.map((x) => x.id));
   ids.set(path, v);
   return v;

@@ -1,6 +1,7 @@
 // 키오스크 화면 하니스 진입점.
 //   /?screen=admin                 관리자 설정 화면(로그인부터)
 //   /?screen=idle&theme=<themeId>  손님이 보는 대기 화면(그 첫화면을 고른 상태)
+//   /?screen=boot&case=<이름>      켜질 때 나오는 부팅 화면(상황별, boot.ts)
 //
 // ★ import 순서가 중요하다: stubs 가 window.agentAPI / window.kiosk 를 만든 뒤에
 //   화면 모듈을 불러야 한다. 그래서 화면은 동적 import 로 가져온다.
@@ -15,6 +16,7 @@ await import("@kiosk/i18n");
 const { useAppStore } = await import("@kiosk/store");
 const AdminPage = (await import("@kiosk/pages/AdminPage")).default;
 const IdlePage = (await import("@kiosk/pages/IdlePage")).default;
+const BootPage = (await import("@kiosk/pages/BootPage")).default;
 const { state, NEW_THEME, defaultConfig } = await import("./fixtures");
 
 const params = new URLSearchParams(location.search);
@@ -33,6 +35,7 @@ if (screen === "idle") {
   state.config = config;
   useAppStore.getState().setSystemConfig(config as never);
 }
+if (screen === "boot") (await import("./boot")).applyBootCase(params.get("case") ?? "progress");
 useAppStore.setState({ currentStep: screen });
 
 // App.tsx 의 래퍼를 그대로 옮겼다(관리자 화면은 글자 크기 배율을 적용하지 않는다).
@@ -42,7 +45,7 @@ function Shell() {
       <div className="w-full h-full">
         <div className="kiosk-scale w-full h-full">
           <div className="font-sans text-maclike text-thicker text-stroked w-full h-full">
-            {screen === "idle" ? <IdlePage /> : <AdminPage />}
+            {screen === "idle" ? <IdlePage /> : screen === "boot" ? <BootPage /> : <AdminPage />}
           </div>
         </div>
       </div>
