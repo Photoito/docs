@@ -18,6 +18,8 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const BASE = process.env.DEMO_BASE ?? "http://127.0.0.1:3412";
 const OUT = resolve(HERE, "../../images/ko");
 
+const CLOCK_OFFSET = Number(process.env.DEMO_CLOCK_OFFSET_HOURS || 0) * 3_600_000;
+
 const only = process.argv.slice(2);
 const files = readdirSync(join(HERE, "shots"))
   .filter((f) => f.endsWith(".mjs"))
@@ -68,6 +70,25 @@ for (const file of files) {
       timezoneId: "Asia/Seoul"
     });
     await ctx.addCookies([{ name: "sidebar_state", value: "true", url: base }]);
+    // 데모 서버의 시계를 밀었으면(fake-clock.cjs) 브라우저도 같은 만큼 민다.
+    if (CLOCK_OFFSET) {
+      await ctx.addInitScript((offset) => {
+        const Real = Date;
+        const realNow = Real.now.bind(Real);
+        class Shifted extends Real {
+          constructor(...args) {
+            if (args.length === 0) super(realNow() + offset);
+            else super(...args);
+          }
+          static now() {
+            return realNow() + offset;
+          }
+        }
+        Shifted.UTC = Real.UTC;
+        Shifted.parse = Real.parse;
+        globalThis.Date = Shifted;
+      }, CLOCK_OFFSET);
+    }
     const page = await ctx.newPage();
     const out = join(OUT, group, `${shot.name}.png`);
     try {

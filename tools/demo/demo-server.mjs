@@ -1,5 +1,6 @@
 // 데모 서버 — 메모리 Postgres(PGlite) + 가짜 BE API. 전부 지어낸 데이터.
 //   node demo-server.mjs [photoito-ddl 경로]   (기본: 이 레포 옆의 ../photoito-ddl)
+import "./fake-clock.cjs"; // DEMO_CLOCK_OFFSET_HOURS — 맨 먼저 불러야 한다
 import { readdirSync, readFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { join, dirname, resolve } from "node:path";

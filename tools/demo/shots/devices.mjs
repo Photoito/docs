@@ -4,6 +4,8 @@
 // 키오스크를 오프라인으로 본다. 그래서 이 묶음은 **브라우저 안에서만** 실시간 연결을
 // 흉내 낸다(page.routeWebSocket) — 데모 서버는 건드리지 않는다. 값은 전부 지어낸 것이다.
 const LIST = "/dashboard/device-management";
+// 데모의 시계를 밀었으면(fake-clock.cjs) 「마지막 상태」 시각도 같이 민다.
+const CLOCK_OFFSET = Number(process.env.DEMO_CLOCK_OFFSET_HOURS || 0) * 3_600_000;
 const BOOTH1 = "1번 부스";
 const BOOTH2 = "2번 부스";
 
@@ -23,14 +25,14 @@ const liveStatuses = (overrides = {}) => [
   {
     device_id: "demo-device-1",
     is_online: true,
-    last_status_at: new Date().toISOString(),
+    last_status_at: new Date(Date.now() + CLOCK_OFFSET).toISOString(),
     last_device_status: report(18, 46, 37, 5, "capture"),
     ...overrides["demo-device-1"]
   },
   {
     device_id: "demo-device-2",
     is_online: true,
-    last_status_at: new Date().toISOString(),
+    last_status_at: new Date(Date.now() + CLOCK_OFFSET).toISOString(),
     last_device_status: report(7, 41, 52, 3, "idle"),
     ...overrides["demo-device-2"]
   }
@@ -182,6 +184,31 @@ export default [
       await page.waitForTimeout(600);
     },
     target: (page) => page.getByRole("alertdialog")
+  },
+  {
+    // 확인 창까지만 연다 — 마지막 「전체 프로그램 재시작」은 누르지 않는다.
+    name: "bulk-restart-confirm",
+    path: LIST,
+    run: async (page) => {
+      await live()(page);
+      await page.getByRole("button", { name: /일괄작업/ }).click();
+      await page.getByRole("button", { name: "전체 프로그램 재시작" }).click();
+      await page.getByRole("alertdialog").waitFor();
+      await page.waitForTimeout(600);
+    },
+    target: (page) => page.getByRole("alertdialog")
+  },
+  {
+    name: "details-versions",
+    path: LIST,
+    run: async (page) => {
+      await live()(page);
+      await openFromCard(page, BOOTH1, "상세");
+      await page.getByRole("heading", { name: "버전" }).scrollIntoViewIfNeeded();
+      await page.getByRole("heading", { name: "버전" }).evaluate((el) => el.scrollIntoView({ block: "start" }));
+      await page.waitForTimeout(800);
+    },
+    target: (page) => page.getByRole("heading", { name: "버전" }).locator("xpath=..")
   },
   {
     // 프리셋 관리 문서가 쓴다 — 실시간 값이 채워진 화면이 이 묶음에만 있어서 여기서 찍는다.

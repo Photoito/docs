@@ -66,6 +66,31 @@ npx mint@latest dev --port 3345          # 레포 루트에서
 cd tools/demo && npm run verify -- http://localhost:3345 dashboard/frames dashboard/themes
 ```
 
+### 대시보드 개발 서버를 이미 띄워 두었다면
+
+Next 는 한 폴더에서 개발 서버를 하나만 띄울 수 있다(`.next/dev/lock`). 대시보드 레포에서 `pnpm dev` 가
+돌고 있으면 데모가 뜨지 않는다. 그때는 대시보드를 다른 폴더에 복사해 그쪽으로 띄운다.
+
+```bash
+git clone --local ../photoito-dashboard ../photoito-dashboard-docs-demo
+(cd ../photoito-dashboard-docs-demo && pnpm install --frozen-lockfile)
+bash tools/demo/run-dashboard.sh "$(cd ../photoito-dashboard-docs-demo && pwd)"
+```
+
+대시보드가 바뀌면 복사본에서 `git pull` 한 뒤 다시 띄운다.
+
+### 밤에 찍을 때 — 시계 밀기
+
+데이터는 "지금"까지만 채워진다. 새벽에 찍으면 홈의 「오늘 매출」이 0원이고 지난주 비교도 비어 나온다.
+`DEMO_CLOCK_OFFSET_HOURS` 로 데모 서버·대시보드·캡처 브라우저의 시계를 같은 만큼 밀어 오후로 만든다
+(`fake-clock.cjs`). 세 명령에 **같은 값**을 줘야 한다. 날짜가 넘어가지 않는 값으로 고른다.
+
+```bash
+DEMO_CLOCK_OFFSET_HOURS=13 npm run db
+DEMO_CLOCK_OFFSET_HOURS=13 npm run dashboard
+DEMO_CLOCK_OFFSET_HOURS=13 npm run shots
+```
+
 ### 알아둘 것
 
 - 날짜는 실행 시점 기준으로 만들어진다. 난수는 고정 시드라 분포는 매번 같다.
@@ -80,4 +105,6 @@ cd tools/demo && npm run verify -- http://localhost:3345 dashboard/frames dashbo
 - 쿠폰 코드는 숫자 6자리만 가능하다(입력 칸과 키오스크 키패드 모두). 시드도 그렇게 넣는다.
 - 여러 화면을 한꺼번에 찍을 때는 데모의 데이터를 바꾸지 않는다(저장·삭제·전송 버튼을 누르지 않는다).
   메모리 DB 하나를 모든 화면이 같이 쓴다.
+- 공지사항 묶음은 공지를 하나 연다(읽음으로 바뀐다). 그 뒤에 찍는 화면의 「새 공지 n개」가 하나 줄어든다 — 전부 다시 찍을 때는 `npm run db` 를 새로 띄우고 한 번에 찍는다.
+- 프레임 순서는 `sort_source='kiosk'` 로 채워 둔다. 비우면 프레임 관리에 「아직 키오스크에서 쓰던 순서를 받지 못했어요」 경고가 뜬다.
 - 아직 데모에 없는 것: 프리셋(목록이 빈 채로 찍힌다), 세션 타임라인, 촬영 직후의 사진 미리보기.

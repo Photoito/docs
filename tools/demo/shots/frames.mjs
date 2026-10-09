@@ -28,6 +28,20 @@ async function uploadAndName(page, ctx) {
 // 카테고리 칸(0)과 필터 칸(1) 아래의 「추가」 버튼.
 const addButton = (page, i) => page.getByRole("button", { name: "추가", exact: true }).nth(i);
 
+// 프레임 순서 — 이름 왼쪽의 점 여섯 개 손잡이.
+const handle = (page, name) => page.getByRole("button", { name: `${name} 순서 옮기기` });
+// 키보드로 한 칸 옮긴다(스페이스로 집고 → 로 옮기고 스페이스로 놓는다). 「적용」은 누르지 않는다.
+const moveRight = async (page, name) => {
+  await handle(page, name).focus();
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(300);
+  await page.keyboard.press("ArrowRight");
+  await page.waitForTimeout(300);
+  await page.keyboard.press("Space");
+  await page.getByText("순서를 바꿨어요. 아직 저장되지 않았어요.").waitFor();
+  await page.waitForTimeout(500);
+};
+
 export default [
   { name: "list", path: LIST },
   { name: "add-button", path: LIST, mark: (page) => [page.getByRole("button", { name: "프레임 추가" })] },
@@ -94,6 +108,15 @@ export default [
       await page.getByRole("dialog").getByRole("checkbox").nth(1).click();
     },
     target: (page) => page.getByRole("dialog")
+  },
+  { name: "order-notice", path: LIST, mark: (page) => [page.getByText("프레임 순서는 이제 여기서 정해요").locator("xpath=../..")] },
+  { name: "order-handle", path: LIST, viewport: { width: 1200, height: 1100 }, mark: (page) => [handle(page, FRAME)] },
+  {
+    name: "order-apply",
+    path: LIST,
+    viewport: { width: 1200, height: 1100 },
+    run: (page) => moveRight(page, FRAME),
+    mark: (page) => [page.getByRole("button", { name: "되돌리기" }), page.getByRole("button", { name: "적용", exact: true })]
   },
   { name: "card-buttons", path: LIST, mark: (page) => [card(page).getByRole("button", { name: "수정" }), card(page).getByRole("button", { name: "할당" }), page.getByRole("button", { name: `${FRAME} 조작` })] },
   {

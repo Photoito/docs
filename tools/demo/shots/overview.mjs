@@ -10,7 +10,17 @@ const TALL = { width: 1560, height: 1500 };
 const card = (page, text) => page.locator('[data-slot="card"]').filter({ hasText: text }).first();
 const statCards = (page) => page.getByText("오늘 매출").locator("xpath=ancestor::div[contains(@class,'lg:grid-cols-12')][1]");
 const calendar = (page) => card(page, "일별 매출 및 인쇄 리포트");
-const dayCell = (page, day) => calendar(page).locator("div.h-28.cursor-pointer").nth(day - 1);
+const dayCell = (page, day) => calendar(page).locator("div.min-h-28.cursor-pointer").nth(day - 1);
+
+const renewalPill = (page) => calendar(page).getByText(/^갱신 [0-9]+개$/).locator("visible=true").first();
+// 갱신 표시가 보일 때까지 다음 달로 넘긴다(최대 두 번).
+const toRenewalMonth = async (page) => {
+  for (let i = 0; i < 2 && (await renewalPill(page).count()) === 0; i++) {
+    await calendar(page).getByRole("button").nth(1).click();
+    await page.waitForTimeout(3000);
+  }
+  await renewalPill(page).waitFor({ timeout: 15_000 });
+};
 
 export default [
   {
@@ -51,6 +61,27 @@ export default [
       await dayCell(page, 3).click();
       await page.getByRole("dialog").waitFor();
       await page.getByRole("dialog").getByText("기기별").waitFor({ timeout: 15_000 });
+      await page.waitForTimeout(500);
+    },
+    target: (page) => page.getByRole("dialog")
+  },
+  // 라이선스 일정 — 다음 구독 갱신일이 있는 달로 넘겨서 찍는다(데모의 갱신일은 23일 뒤).
+  {
+    name: "calendar-license",
+    path: HOME,
+    viewport: TALL,
+    run: toRenewalMonth,
+    target: calendar,
+    mark: (page) => [renewalPill(page)]
+  },
+  {
+    name: "day-license",
+    path: HOME,
+    viewport: TALL,
+    run: async (page) => {
+      await toRenewalMonth(page);
+      await renewalPill(page).click();
+      await page.getByRole("dialog").getByText("라이선스 일정").waitFor({ timeout: 15_000 });
       await page.waitForTimeout(500);
     },
     target: (page) => page.getByRole("dialog")

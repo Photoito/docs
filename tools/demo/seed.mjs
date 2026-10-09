@@ -87,6 +87,11 @@ export async function seed(db) {
       ('demo-device-1', '00000000-0000-4000-8000-0000000000a1', 'DEMO-AAAA-1111-BOOTH', 'demo-fp-1', '1번 부스', 'windows', 'x64', 'Intel(R) Core(TM) i5-12400', 12, 16, 'Windows 11 Pro', '10.0.26100', ${q(iso(days(-118)))}, now()),
       ('demo-device-2', '00000000-0000-4000-8000-0000000000a2', 'DEMO-BBBB-2222-BOOTH', 'demo-fp-2', '2번 부스', 'windows', 'x64', 'Intel(R) Core(TM) i5-12400', 12, 16, 'Windows 11 Pro', '10.0.26100', ${q(iso(days(-97)))}, now());
 
+    -- 키오스크가 라이선스를 갱신할 때 함께 올리는 버전 정보(장치 상세의 「버전」 칸).
+    UPDATE devices SET app_version = '1.19.0',
+      agent_versions = '{"camera":"1.8.2","printer":"1.6.0","media":"1.12.1","payment":"1.4.3"}'::jsonb,
+      versions_reported_at = now() - interval '2 hours';
+
     INSERT INTO device_printers (device_id, printer_name, printer_config_name, printer_role, serial_number, firmware_version, status, remaining_prints, total_prints, last_status_at) VALUES
       ('demo-device-1', 'DNP DS-RX1HS', 'DS-RX1HS', '6x4-main', 'DEMO-PRN-0001', '2.06', 'ready', 412, 700, now()),
       ('demo-device-1', 'DNP DS620', 'DS620', '6x2-main', 'DEMO-PRN-0003', '1.61', 'ready', 268, 400, now()),
@@ -97,6 +102,16 @@ export async function seed(db) {
       ('demo-device-2', 'Canon EOS R100', 'USB', 'DEMO-CAM-0002', '1.3.0', 'main', 'connected', now());
   `);
 
+  // 구독 — 홈 달력의 「갱신 n개」가 이 표를 직접 읽는다. 값은 mock-routes.mjs 의 구독 응답과 같게 둔다.
+  await db.exec(`
+    INSERT INTO commerce.subscriptions (id, user_id, store_id, plan_id, license_id, status, current_period_start, current_period_end, next_billing_at)
+    SELECT v.id::uuid, 'demo-owner', '${STORE_ID}', p.id, v.lic::uuid, 'active', ${q(iso(days(-7)))}, ${q(iso(days(23)))}, ${q(iso(days(23)))}
+    FROM commerce.plans p,
+      (VALUES ('00000000-0000-4000-8000-0000000000f1', '00000000-0000-4000-8000-0000000000a1'),
+              ('00000000-0000-4000-8000-0000000000f2', '00000000-0000-4000-8000-0000000000a2')) AS v(id, lic)
+    WHERE p.code = 'standard';
+  `).catch((e) => console.log("[seed] 구독 건너뜀:", e.message.slice(0, 160)));
+
   // ── 콘텐츠 ──
   await db.exec(`
     INSERT INTO store_frame_categories (category_id, store_id, category_name, summary, description, cover_filename, sort_order, r2_bucket, r2_path, assigned_at) VALUES
@@ -105,8 +120,10 @@ export async function seed(db) {
     INSERT INTO store_filters (filter_id, store_id, filter_name, spec, thumb_filename, r2_bucket, r2_path, assigned_at) VALUES
       ${FILTERS.map((f) => `(${q(f.id)}, '${STORE_ID}', ${q(f.name)}, '{}'::jsonb, 'thumb.png', 'store-datas', '${STORE_ID}/filters/${f.id}/', ${q(iso(days(-90)))})`).join(",")};
 
-    INSERT INTO store_frames (frame_id, store_id, frame_name, r2_bucket, r2_path, price, currency, is_active, category_id, assigned_at, updated_at) VALUES
-      ${FRAMES.map((f, i) => row(f.id, STORE_ID, f.name, "store-datas", `${STORE_ID}/frames/`, f.price, "KRW", i !== 5, f.cat, iso(days(-100 + i * 9)), iso(days(-40 + i * 6)))).join(",")};
+    -- 순서는 키오스크가 올려 둔 것으로 채운다(sort_source='kiosk'). 비워 두면 프레임 관리 화면에
+    -- 「아직 키오스크에서 쓰던 순서를 받지 못했어요」라는 빨간 안내가 뜬다 — 새 버전 키오스크를 한 번 켠 가게의 평소 모습이 아니다.
+    INSERT INTO store_frames (frame_id, store_id, frame_name, r2_bucket, r2_path, price, currency, is_active, category_id, assigned_at, updated_at, sort_order, sort_source, sort_updated_at) VALUES
+      ${FRAMES.map((f, i) => row(f.id, STORE_ID, f.name, "store-datas", `${STORE_ID}/frames/`, f.price, "KRW", i !== 5, f.cat, iso(days(-100 + i * 9)), iso(days(-40 + i * 6)), FRAMES.filter((x, j) => x.cat === f.cat && j < i).length + 1, "kiosk", iso(days(-1)))).join(",")};
 
     INSERT INTO store_frame_devices (frame_id, device_id)
       SELECT f.frame_id, d.id FROM store_frames f CROSS JOIN devices d WHERE f.is_active;

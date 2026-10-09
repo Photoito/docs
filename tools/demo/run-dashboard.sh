@@ -38,5 +38,10 @@ export NEXT_PUBLIC_SENTRY_DISABLED="true"
 export NEXT_PUBLIC_SENTRY_DSN=""
 export NEXT_TELEMETRY_DISABLED=1
 
+# 시계 밀기(fake-clock.cjs) — 데모 서버와 같은 값이어야 한다.
+if [ -n "${DEMO_CLOCK_OFFSET_HOURS:-}" ]; then
+  export NODE_OPTIONS="--require $(cd "$(dirname "$0")" && pwd -W 2>/dev/null || pwd)/fake-clock.cjs"
+fi
+
 cd "$DASH"
 exec node node_modules/next/dist/bin/next dev --turbopack -H 127.0.0.1 -p 3411
