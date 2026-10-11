@@ -3,6 +3,8 @@
 const LIST = "/dashboard/coupon-management";
 // 데모 쿠폰 코드가 길어서 기본 폭(1200)에서는 목록의 글자가 겹친다.
 const WIDE = { width: 1500, height: 820 };
+// 쿠폰 만들기 창은 안쪽이 화면 높이의 60%까지만 보이고 그 아래는 스크롤된다.
+const TALL = { width: 1500, height: 1500 };
 
 const dialog = (page) => page.getByRole("dialog");
 
@@ -34,40 +36,89 @@ export default [
   {
     name: "create-dialog",
     path: LIST,
-    viewport: WIDE,
+    viewport: TALL,
     run: async (page) => {
       await openCreate(page);
       await page.locator("#name").fill("첫 방문 1,000원 할인");
-      await page.locator("#discount_type").click();
-      await page.getByRole("option", { name: /고정 금액/ }).click();
+      await page.getByRole("radio", { name: /금액/ }).click();
       await page.locator("#discount_value").fill("1000");
     },
     target: dialog
   },
   {
+    name: "create-usage",
+    path: LIST,
+    viewport: TALL,
+    run: async (page) => {
+      await openCreate(page);
+      await page.locator("#name").fill("첫 방문 1,000원 할인");
+      await page.getByRole("radio", { name: /횟수 정하기/ }).click();
+      await page.locator("#usage_limit").fill("500");
+    },
+    target: dialog,
+    mark: (page) => [
+      page.locator('label[for="usage-mode-once"]'),
+      page.locator('label[for="usage-mode-count"]'),
+      page.locator('label[for="usage-mode-unlimited"]')
+    ]
+  },
+  {
+    name: "create-unlimited",
+    path: LIST,
+    viewport: TALL,
+    run: async (page) => {
+      await openCreate(page);
+      await page.locator("#name").fill("가을 행사 20% 할인");
+      await page.locator("#discount_value").fill("20");
+      await page.getByRole("radio", { name: /제한 없음/ }).click();
+      await page.waitForTimeout(300);
+    },
+    target: (page) => page.getByRole("radiogroup")
+  },
+  {
+    // 확인 창까지만 연다 — 「제한 없이 만들기」는 누르지 않는다.
+    name: "unlimited-confirm",
+    path: LIST,
+    viewport: TALL,
+    run: async (page) => {
+      await openCreate(page);
+      await page.locator("#name").fill("가을 행사 20% 할인");
+      await page.locator("#discount_value").fill("20");
+      await page.getByRole("radio", { name: /제한 없음/ }).click();
+      await page.getByRole("button", { name: "생성", exact: true }).click();
+      await page.getByRole("alertdialog").waitFor();
+      await page.waitForTimeout(400);
+    },
+    target: (page) => page.getByRole("alertdialog")
+  },
+  {
     name: "create-code",
     path: LIST,
-    viewport: WIDE,
+    viewport: TALL,
     run: async (page) => {
       await openCreate(page);
       await page.locator("#name").fill("첫 방문 1,000원 할인");
       await page.locator("#auto-code").click();
       await page.locator("#code").fill("202610");
+      await page.locator("#code").scrollIntoViewIfNeeded();
     },
-    mark: (page) => [page.locator("#auto-code"), page.locator("#code")]
+    target: dialog,
+    mark: (page) => [page.locator("#quantity"), page.locator("#auto-code"), page.locator("#code")]
   },
   {
     name: "create-advanced",
     path: LIST,
-    viewport: { width: 1500, height: 1000 },
+    viewport: TALL,
     run: async (page) => {
       await openCreate(page);
       await page.locator("#name").fill("첫 방문 1,000원 할인");
       await page.getByText("고급 설정 펼치기").click();
       await page.locator("#min_purchase_amount").waitFor();
+      await page.locator("#purpose").scrollIntoViewIfNeeded();
       await page.waitForTimeout(400);
     },
-    target: dialog
+    target: dialog,
+    mark: (page) => [page.locator("#min_purchase_amount").locator("xpath=ancestor::div[@data-state='open'][1]")]
   },
   {
     name: "row-controls",
@@ -82,7 +133,7 @@ export default [
   {
     name: "edit-dialog",
     path: LIST,
-    viewport: WIDE,
+    viewport: TALL,
     run: async (page) => {
       await page.getByRole("button", { name: "수정", exact: true }).first().click();
       await dialog(page).waitFor();
@@ -117,7 +168,7 @@ export default [
   {
     name: "rule-dialog",
     path: LIST,
-    viewport: WIDE,
+    viewport: TALL,
     run: async (page) => {
       await openRule(page);
       await page.locator("#rule-label").fill("단골 무료 1회");
