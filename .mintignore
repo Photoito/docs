@@ -8,3 +8,6 @@ drafts/
 
 # 스크린샷 생성 도구(문서가 아니다)
 tools/
+
+# 새 사이트(@dgit/docs). Mintlify 가 이 안의 .js 를 쪽마다 싣지 않게 뺀다.
+site/
