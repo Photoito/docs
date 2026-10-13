@@ -50,7 +50,7 @@ for (const f of pages) {
     ["Step", /<Step[\s>]/g, /<li class="step">/g],
     ["Accordion", /<Accordion[\s>]/g, /<details class="acc"/g],
     ["Frame", /<Frame[\s>]/g, /<figure class="frame">/g],
-    ["Card", /<Card[\s>]/g, /class="card"/g],
+    ["Card", /<Card[\s>]/g, /class="card[ "]/g],
     ["Note/Tip/Warning/Info", /<(Note|Tip|Warning|Info|Check|Danger)[\s>]/g, /<div class="note[ "]/g],
     ["img", /<img\s|!\[/g, /<img\s/g],
     ["Tabs", /<Tab[\s>]/g, /<input type="radio"/g],

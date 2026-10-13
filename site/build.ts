@@ -13,7 +13,7 @@
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { icons } from "lucide";
-import { afterLede, askRow, docMenu, docsLayout, docsScript, escape, frontMatter, lede, llmsTxt, menuPages, mintlifyHeadingId, prevNext, renderMarkdown, tocLinks, type DocGroup } from "./src/lib/docs";
+import { afterLede, askRow, docMenu, docsLayout, docsScript, docsSearch, escape, frontMatter, lede, llmsTxt, menuPages, mintlifyHeadingId, prevNext, renderMarkdown, searchIndex, tocLinks, type DocGroup } from "./src/lib/docs";
 import { DOCS_CSS } from "./src/lib/docs-css";
 import { FA_TO_LUCIDE, lucideIcons, svgIcon, lucideExport, type IconNode } from "./src/lib/docs-icons";
 
@@ -32,7 +32,7 @@ const INDEXABLE = SITE === PROD;
 const FIXES: [page: string, from: string, to: string][] = [];
 /**
  * 공개 사이트에 나가면 안 되는 낱말의 SHA-256(키오스크 관리자 비밀번호). 글 자체는 이 파일에도 적지 않는다.
- * dist/ 의 html·md·txt·xml·js 에서 영문·숫자 낱말마다 해시를 내 비교하고, 하나라도 맞으면 빌드가 멈춘다.
+ * dist/ 의 html·md·txt·xml·js·json 에서 영문·숫자 낱말마다 해시를 내 비교하고, 하나라도 맞으면 빌드가 멈춘다.
  */
 const SECRET_HASHES = new Set(["240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"]);
 
@@ -117,7 +117,7 @@ html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 "Pretendard Variable",Pretendard,ui-sans-serif,system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
 .top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .top>div{max-width:1280px;margin:0 auto;height:60px;padding:0 24px;display:flex;align-items:center;gap:8px}
-.logo{margin-right:auto;display:flex;align-items:center}.logo img{height:28px;width:auto;display:block}
+.logo{margin-right:20px;display:flex;align-items:center}.srch-b{margin-right:auto}.logo img{height:28px;width:auto;display:block}
 .logo .d{display:none}
 :root[data-theme="dark"] .logo .l{display:none}:root[data-theme="dark"] .logo .d{display:block}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .logo .l{display:none}:root:not([data-theme="light"]) .logo .d{display:block}}
@@ -135,7 +135,8 @@ main{max-width:1280px;margin:0 auto;padding:0 24px 80px}
 .doc .card-i{color:var(--brand)}
 .doc .eyebrow{margin:0 0 8px;font-size:14px;font-weight:600;color:var(--brand)}
 footer{border-top:1px solid var(--line);padding:24px;text-align:center;font-size:13px;color:var(--muted)}footer a{color:inherit}
-@media (max-width:820px){.top>div{padding:0 16px}.navlink{display:none}main{padding:0 8px 64px}}
+@media (max-width:820px){.top>div{padding:0 16px;gap:6px}.navlink{display:none}main{padding:0 8px 64px}.logo{margin-right:4px}.logo img{height:22px}.navbtn{height:32px;padding:0 12px;font-size:13px}.theme{flex:none;width:32px;height:32px}}
+@media (max-width:370px){.navbtn{display:none}}
 `;
 
 const SUN = iconSvg("sun", 16).replace("<svg", '<svg class="sun"');
@@ -151,7 +152,9 @@ const ANALYTICS = POSTHOG_KEY
   : "";
 
 const navbar = config.navbar ?? {};
-const header = `<header class="top"><div><a class="logo" href="/" aria-label="${escape(config.name)}"><img class="l" src="${config.logo.light}" alt="${escape(config.name)}"><img class="d" src="${config.logo.dark}" alt=""></a>${(navbar.links ?? []).map((l) => `<a class="navlink" href="${escape(l.href)}" target="_blank" rel="noopener">${escape(l.label)}</a>`).join("")}${navbar.primary ? `<a class="navbtn" href="${escape(navbar.primary.href)}" target="_blank" rel="noopener">${escape(navbar.primary.label)}</a>` : ""}<button class="theme" type="button" aria-label="밝은 화면·어두운 화면 바꾸기">${SUN}${MOON}</button></div></header>`;
+/** 검색: 빌드 때 만든 /search.json 을 처음 열 때 받는다(외부 서비스 없음). Ctrl K·⌘K·/ 로 연다. */
+const SEARCH = docsSearch({ index: "/search.json", labels: { button: "검색", placeholder: "가이드에서 찾기", empty: "찾는 내용이 없어요", close: "닫기" } });
+const header = `<header class="top"><div><a class="logo" href="/" aria-label="${escape(config.name)}"><img class="l" src="${config.logo.light}" alt="${escape(config.name)}"><img class="d" src="${config.logo.dark}" alt=""></a>${SEARCH.button}${(navbar.links ?? []).map((l) => `<a class="navlink" href="${escape(l.href)}" target="_blank" rel="noopener">${escape(l.label)}</a>`).join("")}${navbar.primary ? `<a class="navbtn" href="${escape(navbar.primary.href)}" target="_blank" rel="noopener">${escape(navbar.primary.label)}</a>` : ""}<button class="theme" type="button" aria-label="밝은 화면·어두운 화면 바꾸기">${SUN}${MOON}</button></div></header>`;
 const anchors = `<div class="anchors">${(config.navigation.global?.anchors ?? []).map((a) => `<a href="${escape(a.href)}" target="_blank" rel="noopener">${iconSvg(a.icon)}${escape(a.anchor)}</a>`).join("")}</div>`;
 
 /** 한국어 버튼 이름. */
@@ -174,13 +177,14 @@ ${o.md ? `<link rel="alternate" type="text/markdown" href="${o.md}">` : ""}
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 ${THEME_HEAD}
-<style>${SHELL}${DOCS_CSS.focus}${DOCS_CSS.content}${DOCS_CSS.layout}${o.extended ? DOCS_CSS.extra : ""}</style>
+<style>${SHELL}${DOCS_CSS.focus}${DOCS_CSS.content}${DOCS_CSS.layout}${o.extended ? DOCS_CSS.extra : ""}${DOCS_CSS.search}</style>
 ${ANALYTICS}
 </head>
 <body>
 ${header}
 <main>${o.body}</main>
 <footer>© 포토이토 · <a href="https://www.photoito.kr" target="_blank" rel="noopener">photoito.kr</a></footer>
+${SEARCH.dialog}
 ${SCRIPT}
 ${THEME_SCRIPT}
 <script src="/channeltalk.js" defer></script>
@@ -236,6 +240,7 @@ write("_redirects", `${redirects.join("\n")}\n`);
 write("_headers", `/images/*\n  Cache-Control: public, max-age=86400\n/*.md\n  Content-Type: text/markdown; charset=utf-8\n`);
 write("robots.txt", INDEXABLE ? `User-agent: *\nAllow: /\nSitemap: ${SITE}/sitemap.xml\n` : "User-agent: *\nDisallow: /\n");
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${order.map((l) => `<url><loc>${SITE}${l.href}</loc></url>`).join("\n")}\n</urlset>\n`);
+write("search.json", JSON.stringify(searchIndex(order.map((l) => { const p = all.find((x) => x.href === l.href)!; return { href: p.href, title: p.title, md: p.md }; }), { headingId: mintlifyHeadingId })));
 write(
   "llms.txt",
   llmsTxt({
@@ -246,7 +251,7 @@ write(
 );
 
 // 비밀값 검사: 나가면 안 되는 글이 dist/ 에 남았으면 멈춘다.
-const leaked = new Bun.Glob("**/*.{html,md,txt,xml,js}").scanSync(OUT);
+const leaked = new Bun.Glob("**/*.{html,md,txt,xml,js,json}").scanSync(OUT);
 const sha256 = (w: string) => new Bun.CryptoHasher("sha256").update(w).digest("hex");
 for (const f of leaked) {
   const words = new Set(readFileSync(join(OUT, f), "utf8").match(/[A-Za-z0-9!@#$%^&*_.-]{4,}/g) ?? []);
