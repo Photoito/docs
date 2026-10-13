@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // 포토이토 사용자 가이드. dist/ (bun build.ts 가 만든다)를 정적 에셋으로만 올린다: 워커 코드 없음.
+  // 지금은 DGit 계정의 workers.dev 임시 주소다. 포토이토 계정으로 옮길 때 account_id 를 바꾸고,
+  // docs.photoito.kr 로 옮길 때 routes 에 custom_domain 을 넣고 SITE_URL=https://docs.photoito.kr 로 빌드한다.
+  "name": "photoito-docs",
+  "account_id": "a94e720e299d085a43f09d5ee6dddf74",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

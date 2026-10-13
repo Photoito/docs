@@ -1,0 +1,17 @@
+{
+  "name": "photoito-docs-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build.ts",
+    "check": "bun check.ts",
+    "dev": "bun build.ts && wrangler dev",
+    "deploy": "bun build.ts && wrangler deploy"
+  },
+  "dependencies": {
+    "lucide": "^1.56.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.150.0"
+  }
+}
