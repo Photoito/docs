@@ -64,3 +64,14 @@
 npx mint@latest dev --port 3345
 cd tools/demo && npm run verify -- http://localhost:3345 dashboard/frames
 ```
+
+## 공통 개발 규칙 (2026-10-15)
+
+- **머지는 squash 하나뿐이다.** PR 제목이 main 커밋 제목, PR 본문이 커밋 본문이 된다.
+- **브랜치 갱신은 `git rebase origin/main` 뒤 `git push --force-with-lease`.** main 을 브랜치에 merge 하지 않는다.
+- **main 은 보호한다.** main 에 직접 push·force push·삭제하지 않고, 관리자 권한으로 우회해 머지하지 않는다. 모든 변경은 PR 로 간다.
+- **PR 본문은 배경 · 변경 · 화면(전/후) · 위험**([템플릿](.github/pull_request_template.md)). 화면이 바뀌면 전/후 이미지(움직임은 영상)를 붙인다. **화면이 바뀌었는데 이미지가 없으면 머지하지 않는다.** 바뀌지 않으면 「해당 없음 — 이유」.
+- 이미지·영상은 `shot-upload <파일>`(R2 공개 버킷 `pr-shots`, URL·마크다운 출력)로 올려 링크를 붙인다. 없는 기계에서는 PR 편집창에 끌어다 놓는다. 공개 링크이므로 실제 고객 정보가 보이면 가상 데이터로 찍거나 가린다.
+- **서로 의존하는 변경은 `gh stack`**(`gh stack init` → `gh stack add` → `gh stack submit`). 한 층에 한 가지, 테스트를 뺀 변경이 약 400줄을 넘으면 쪼갠다.
+- **테스트는 API 계약 · 권한 경계 · 금액/날짜 계산 · 마이그레이션만 쓴다.** CSS 클래스 · 문구 · 레이아웃 고정 · jsdom 뷰포트 테스트는 쓰지 않는다. DB 를 쓰는 테스트는 테넌트 격리와 돈 관련만 둔다.
+- **리뷰는 PR 을 만든 에이전트가 아니라 별도 서브에이전트가 한다**(작성 대화를 모르는 쪽). 반영하는 것은 정확성·요구사항 지적뿐이고, 취향 지적은 넘긴다.
